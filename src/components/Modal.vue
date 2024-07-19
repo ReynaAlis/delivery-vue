@@ -12,36 +12,18 @@
                 </span>
             </div>
             <div class="cart-modal__body">
-                <div class="cart-item">
-                    <p class="cart-item__title">Ролл угорь стандарт</p>
+                <div v-for="item in cart" :key="item.id" class="cart-item">
+                    <p class="cart-item__title">{{ item.title }}</p>
                     <div class="cart-item__controls">
-                        <div class="cart-item__controls--price">250 ₽</div>
-                        <button class="btn btn-outline">-</button>
-                        <div class="cart-item__controls--count">1</div>
-                        <button class="btn btn-outline">+</button>
-                    </div>
-                </div>
-                <div class="cart-item">
-                    <p class="cart-item__title">Ролл угорь стандарт</p>
-                    <div class="cart-item__controls">
-                        <div class="cart-item__controls--price">250 ₽</div>
-                        <button class="btn btn-outline">-</button>
-                        <div class="cart-item__controls--count">1</div>
-                        <button class="btn btn-outline">+</button>
-                    </div>
-                </div>
-                <div class="cart-item">
-                    <p class="cart-item__title">Ролл угорь стандарт</p>
-                    <div class="cart-item__controls">
-                        <div class="cart-item__controls--price">250 ₽</div>
-                        <button class="btn btn-outline">-</button>
-                        <div class="cart-item__controls--count">1</div>
-                        <button class="btn btn-outline">+</button>
+                        <div class="cart-item__controls--price">{{ item.price }} ₽</div>
+                        <button class="btn btn-outline" @click="updateQuantity(item, -1)">-</button>
+                        <div class="cart-item__controls--count">{{ item.quantity }}</div>
+                        <button class="btn btn-outline" @click="updateQuantity(item, 1)">+</button>
                     </div>
                 </div>
             </div>
             <div class="cart-modal__footer">
-                <div class="cart-modal__footer--price">1250 ₽</div>
+                <div class="cart-modal__footer--price">{{ totalPrice }} ₽</div>
                 <div class="cart-modal__footer--controls">
                     <button class="btn btn-primary">Оформить заказ</button>
                     <button class="btn btn-outline" @click="closeModal()">Отмена</button>
@@ -52,10 +34,22 @@
 </template>
 
 <script setup>
-const { isOpen } = defineProps({ isOpen: Boolean })
-const emit = defineEmits(['toggleModal'])
-const closeModal = () => emit('toggleModal')
+import { store } from "../store/index.js";
+import { computed } from "vue";
 
+const props = defineProps({ isOpen: Boolean });
+const emit = defineEmits(["toggleModal"]);
+const closeModal = () => emit("toggleModal");
+
+const cart = computed(() => store.cart);
+
+const updateQuantity = (item, amount) => {
+    store.updateQuantity(item, amount);
+};
+
+const totalPrice = computed(() => {
+  return store.cart.reduce((total, item) => total + item.price * item.quantity, 0);
+});
 </script>
 
 <style scoped>
